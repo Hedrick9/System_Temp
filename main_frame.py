@@ -29,7 +29,8 @@ def base(): # Base route - "have it return something"
 
 @app.route('/light', methods=['GET'])
 def light(): # Route for fetching data from light sensor
-    return getLightData()
+    light = getLightData()
+    return '{}'.format(light)
 
 @app.route('/api', methods=['GET', 'POST'])
 def api():
