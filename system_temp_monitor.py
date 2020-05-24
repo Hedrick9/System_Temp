@@ -41,27 +41,15 @@ def getDHT22data():
         temp = round(temp)
         temp = temp * 9/5 + 32
     return temp, hum
-def getSoilTemp():
+def getLightData():
     adc0 = gpiozero.MCP3008(channel=0, device=0)
     adc0 = adc0.value*3.0 # conversion from digital output (scaled from 0 to 1) to voltage output (0 to 3V)
     adc0 = adc0*75.006 - 40 # conversion from Vout to temperature [deg F]
     return adc0
 
-def getSoilMoist():
-    adc1 = gpiozero.MCP3008(channel=1, device=0)
-    adc1 = adc1.value
-    if adc1 <= 1.1:
-        adc1 = adc1*10 - 1
-    elif adc1>1.1 and adc1<=1.3:
-        adc1 = adc1*25 - 17.5
-    elif adc1>1.3 and adc1<=1.82:
-        adc1 = adc1*48.08 - 47.5
-    elif adc1>1.82 and adc1<=2.2:
-        adc1 = adc1*26.32 - 7.89
-    else:
-        adc1 = adc1*62.5 - 87.5
-    return adc1
-
 n = 0
 while n < 10:
     print('Soil Temperature: {} *F\n'.format(getSoilTemp()))
+
+for row in curs.execute("SELECT * FROM DHT_data ORDER BY timestamp DESC LIMIT 1"):
+    print (str(row[0])+" ==> Temp = "+str(row[1])+"	Hum ="+str(row[2]))
