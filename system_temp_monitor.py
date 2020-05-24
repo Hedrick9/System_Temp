@@ -3,11 +3,20 @@ import Adafruit_DHT
 import sqlite3 as lite
 import time
 
-conn = sqlite3.connect('SystemTemp.db')
+conn = lite.connect('SystemTemp.db')
 c = conn.cursor()
 
 def create_table():
-    c.execute('CREATE TABLE IF NOT EXISTS atable(Timestamp TEXT, DHT11_Temp REAL, DHT11_Hum REAL, DHT22_Temp REAL, DHT22_Hum REAL, Light_exp REAL)')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS atable(
+            DHT11_Temp REAL, 
+            DHT11_Hum REAL,
+            DHT22_Temp REAL, 
+            DHT22_Hum REAL, 
+            Light_exp REAL,
+            Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
 
 def data_entry():
     unix = time.time()
@@ -17,9 +26,10 @@ def data_entry():
     temp22, hum22 = getDHT22data()
 
 
-    c.execute('INSERT INTO atable (Timestamp, DHT11_Temp, DHT11_Hum, DHT22_Temp, DHT22_Hum, Light_exp) VALUES(?, ?, ?, ?, ?, ?)',
-            (timestamp, temp11, hum11, temp22, hum22, light))
-    conn.commit())
+    c.execute('INSERT INTO atable (DHT11_Temp, DHT11_Hum, DHT22_Temp, DHT22_Hum, Light_exp) VALUES(?, ?, ?, ?, ?)',
+            (temp11, hum11, temp22, hum22, light))
+    conn.commit()
+
 # dbname = 'NameofDatabase.
 # get data from DHT sensor
 def getDHT11data():
@@ -47,9 +57,9 @@ def getLightData():
     adc0 = adc0*75.006 - 40 # conversion from Vout to temperature [deg F]
     return adc0
 
-n = 0
-while n < 10:
-    print('Soil Temperature: {} *F\n'.format(getSoilTemp()))
+# n = 0
+# while n < 10:
+#     print('Soil Temperature: {} *F\n'.format(getSoilTemp()))
 
-for row in curs.execute("SELECT * FROM DHT_data ORDER BY timestamp DESC LIMIT 1"):
-    print (str(row[0])+" ==> Temp = "+str(row[1])+"	Hum ="+str(row[2]))
+# for row in curs.execute("SELECT * FROM DHT_data ORDER BY timestamp DESC LIMIT 1"):
+#     print (str(row[0])+" ==> Temp = "+str(row[1])+"	Hum ="+str(row[2]))
